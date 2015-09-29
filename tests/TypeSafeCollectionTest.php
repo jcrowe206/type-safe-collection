@@ -105,6 +105,10 @@ class TypeSafeCollectionTest extends TestCase {
 
 }
 
+/* ---------------------------------------------------------
+ *  Mock classes below
+ * ---------------------------------------------------------
+ */
 class CollectionTestMockNoRestrictions extends TypeSafeCollection {}
 
 
