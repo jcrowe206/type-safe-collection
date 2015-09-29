@@ -76,6 +76,7 @@ class TypeSafeCollectionTest extends TestCase {
     public function testPushingValidElementDoesNotThrowException()
     {
         $collection = $this->getCollection();
+
         $count = $collection->count();
 
         $collection->push(new CollectionTestAllowedObject1());
@@ -91,6 +92,17 @@ class TypeSafeCollectionTest extends TestCase {
         $collection->put('foo', new CollectionTestAllowedObject1());
 
         static::assertNotEmpty($collection->get('foo'));
+    }
+
+    public function testPrePendingValidElementDoesNotThrowException()
+    {
+        $collection = $this->getCollection();
+
+        $count = $collection->count();
+
+        $collection->prepend(new CollectionTestAllowedObject1());
+
+        static::assertEquals($count + 1, $collection->count());
     }
 
 
