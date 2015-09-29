@@ -105,6 +105,78 @@ class TypeSafeCollectionTest extends TestCase {
         static::assertEquals($count + 1, $collection->count());
     }
 
+    public function testIgnoreFlagDoesNotThrowExceptionAndDoesNotAddItem()
+    {
+        $collection = new CollectionTestMockWithIgnoreSetToTrue([
+            new CollectionTestAllowedObject1(),
+            new CollectionTestAllowedObject2(),
+            new CollectionTestAllowedObject3(),
+            new \stdClass(),
+            new CollectionTestAllowedObject3(),
+            new CollectionTestAllowedObject2(),
+            new CollectionTestAllowedObject1(),
+        ]);
+
+        $count = $collection->count();
+
+        $collection->push(new \stdClass());
+        $collection->put('foo', new \stdClass());
+        $collection->prepend(new \stdClass());
+
+
+        static::assertEquals($count, $collection->count());
+    }
+
+
+    public function testKeyedArraysDoNotBreak()
+    {
+        $collection = new CollectionTestMockWithIgnoreSetToTrue([
+            'first' => new CollectionTestAllowedObject1(),
+            'second' => new CollectionTestAllowedObject2(),
+            'third'  => new \stdClass(),
+            'fourth' => new CollectionTestAllowedObject3()
+        ]);
+
+        static::assertNotEmpty($collection->get('first'));
+        static::assertNotEmpty($collection->get('second'));
+        static::assertNull($collection->get('third'));
+        static::assertNotEmpty($collection->get('fourth'));
+    }
+
+
+    public function testNumericKeyArraysDoNotBreak()
+    {
+        $collection = new CollectionTestMockWithIgnoreSetToTrue([
+            new CollectionTestAllowedObject1(),
+            new CollectionTestAllowedObject2(),
+            new \stdClass(),
+            new CollectionTestAllowedObject3()
+        ]);
+
+        $collection->each(function($item) {
+
+            static::assertNotEmpty($item);
+        });
+
+        static::assertNotEmpty($collection->get(0));
+        static::assertNotEmpty($collection->get(1));
+        static::assertNotEmpty($collection->get(2));
+    }
+
+
+    public function testAssociativeArrayWithNumericKeysDoesNotResetIndex()
+    {
+        $collection = new CollectionTestMockWithIgnoreSetToTrue([
+            1 => new CollectionTestAllowedObject1(),
+            2 => new CollectionTestAllowedObject3(),
+            3 => new \stdClass(),
+            0 => new CollectionTestAllowedObject3()
+        ]);
+
+        static::assertInstanceOf(CollectionTestAllowedObject1::class, $collection->get(1));
+        static::assertEmpty($collection->get(3));
+    }
+
 
     private function getCollection()
     {
@@ -148,6 +220,18 @@ class CollectionTestMockWithUserProvidedCheck extends TypeSafeCollection {
             return false;
         }
     }
+}
+
+
+class CollectionTestMockWithIgnoreSetToTrue extends TypeSafeCollection {
+
+    protected $ignoreInvalidElements = true;
+
+    protected $allowedClasses = [
+        'JCrowe\TypeSafeCollection\Tests\CollectionTestAllowedObject1',
+        'JCrowe\TypeSafeCollection\Tests\CollectionTestAllowedObject2',
+        'JCrowe\TypeSafeCollection\Tests\CollectionTestAllowedObject3'
+    ];
 }
 
 trait CollectionTestNamer {

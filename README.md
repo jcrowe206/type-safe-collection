@@ -54,6 +54,32 @@ class MovieLibrary extends TypeSafeCollection {
 
 ```
 
+#### Ignore invalid types and do not throw exception
+
+```php
+
+class MovieLibrary extends TypeSafeCollection {
+
+    // list of classes that can be added to the collection
+    protected $allowedClasses = [Watchable::class, Rentable::class];
+    
+    // if set to true no exception will be thrown when
+    // attempting to add an invalid value.
+    protected $ignoreInvalidElements = true;
+}
+
+$myLibrary = new MovieLibrary();
+
+$myLibrary->put('my_rentable', new RentableDVD());
+
+$myLibrary->get('my_rentable'); // RentableDVD object
+
+$myLibrary->put('my_readable', new ReadableBook()); // no exception is thrown
+
+$myLibrary->get('my_readable'); // null
+
+```
+
 ## Installation
 
 ```

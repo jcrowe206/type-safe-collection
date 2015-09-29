@@ -9,6 +9,13 @@ use InvalidArgumentException;
 class TypeSafeCollection extends Collection {
 
 
+    /**
+     * If set to true, no exception will be thrown
+     * but invalid elements will not be added
+     *
+     * @var bool
+     */
+    protected $ignoreInvalidElements = false;
 
     /**
      * @var array
@@ -28,7 +35,14 @@ class TypeSafeCollection extends Collection {
     {
         $this->assertValidAllowedTypesAreSet();
 
-        $this->assertElementsAreValidTypes($elements);
+        if ($this->shouldIgnoreInvalidElements()) {
+
+            $elements = $this->getValidElements($elements);
+
+        } else {
+
+            $this->assertElementsAreValidTypes($elements);
+        }
 
         parent::__construct($elements);
     }
@@ -41,9 +55,14 @@ class TypeSafeCollection extends Collection {
      */
     public function put($key, $value)
     {
-        $this->assertIsValidElement($value);
+        if ($this->isValidElement($value)) {
 
-        parent::put($key, $value);
+            parent::put($key, $value);
+
+        } else {
+
+            $this->handleInvalidElement($value);
+        }
     }
 
 
@@ -54,9 +73,15 @@ class TypeSafeCollection extends Collection {
      */
     public function prepend($value)
     {
-        $this->assertIsValidElement($value);
+        if ($this->isValidElement($value)) {
 
-        parent::prepend($value);
+            parent::prepend($value);
+
+        } else {
+
+            $this->handleInvalidElement($value);
+        }
+
     }
 
 
@@ -68,9 +93,43 @@ class TypeSafeCollection extends Collection {
      */
     public function push($value)
     {
-        $this->assertIsValidElement($value);
 
-        parent::push($value);
+        if ($this->isValidElement($value)) {
+
+            parent::push($value);
+
+        } else {
+
+            $this->handleInvalidElement($value);
+        }
+    }
+
+
+    /**
+     * @param $element
+     * @return bool
+     */
+    protected function isInValidElement($element)
+    {
+        return !$this->isValidElement($element);
+    }
+
+
+    /**
+     * @param $element
+     * @return bool
+     */
+    protected function isValidElement($element)
+    {
+        foreach ($this->allowedClasses as $allowedClass) {
+
+            if ($element instanceof $allowedClass) {
+
+                return $this->passesInternalCheck($element);
+            }
+        }
+
+        return false;
     }
 
 
@@ -88,6 +147,25 @@ class TypeSafeCollection extends Collection {
 
 
     /**
+     * @param array $elements
+     * @return array
+     */
+    private function getValidElements(array $elements)
+    {
+        $isAssociativeArray = array_keys($elements) !== range(0, count($elements) - 1);
+
+        foreach ($elements as $key => $element) {
+
+            if ($this->isInvalidElement($element)) {
+
+                unset($elements[$key]);
+            }
+        }
+
+        return $isAssociativeArray ? $elements : array_values($elements);
+    }
+
+    /**
      * Assert that the provided $element can be added to the collection
      *
      * @param $element
@@ -95,26 +173,13 @@ class TypeSafeCollection extends Collection {
      */
     private function assertIsValidElement($element)
     {
-        foreach ($this->allowedClasses as $allowedClass) {
+        if ($this->isInvalidElement($element)) {
 
-            if ($element instanceof $allowedClass && $this->passesInternalCheck($element)) {
-
-                return true;
-            }
+            $this->handleInvalidElement($element);
         }
 
-        $type = gettype($element) === 'object' ? get_class($element) : gettype($element);
-
-        if (!$this->passesInternalCheck($element)) {
-
-            throw new InvalidArgumentException('Invalid argument supplied to ' . get_class($this) . '.');
-        }
-
-        throw new InvalidArgumentException(
-
-            get_class($this) . ' only accepts elements of types ' . implode(',', $this->allowedClasses) . '. ' . $type . ' provided.'
-        );
     }
+
 
 
     /**
@@ -141,6 +206,40 @@ class TypeSafeCollection extends Collection {
 
             throw new \Exception("TypeSafeCollection requires that \$allowedClasses is set and is a not empty array. None provided in " . get_class($this));
         }
+    }
+
+
+    /**
+     * @param $element
+     * @throws InvalidArgumentException
+     */
+    private function handleInvalidElement($element)
+    {
+
+        if ($this->shouldIgnoreInvalidElements()) {
+
+            return false;
+        }
+
+        $type = gettype($element) === 'object' ? get_class($element) : gettype($element);
+
+        $message = get_class($this) . ' only accepts elements of types ' . implode(',', $this->allowedClasses) . '. ' . $type . ' provided.';
+
+        if (!$this->passesInternalCheck($element)) {
+
+            $message = 'Invalid argument supplied to ' . get_class($this) . '.';
+        }
+
+        throw new InvalidArgumentException($message);
+    }
+
+
+    /**
+     * @return bool
+     */
+    private function shouldIgnoreInvalidElements()
+    {
+        return $this->ignoreInvalidElements;
     }
 
 
