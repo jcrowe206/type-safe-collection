@@ -1,6 +1,9 @@
 TypeSafe Collections
 ===================
 
+[![Build Status](https://travis-ci.org/jcrowe206/type-safe-collection.svg?branch=master)](https://travis-ci.org/jcrowe206/type-safe-collection)
+
+
 TypeSafeCollection is a thin wrapper around [Illuminate's Collection object](https://github.com/illuminate/support/blob/master/Collection.php) that allows for easy enforcement of type protection in your collections.  
                                
 ```php
