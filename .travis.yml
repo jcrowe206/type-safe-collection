@@ -18,6 +18,15 @@ php:
   # aliased to a recent hhvm version
   - hhvm
 
+before_script:
+  - composer self-update
+  - composer install --prefer-source --no-interaction --dev
+
 # omitting "script:" will default to phpunit
 # use the $DB env variable to determine the phpunit.xml to use
-script: phpunit --coverage-text
+script:
+  - mkdir -p build/logs
+  - phpunit --coverage-clover build/logs/clover.xml
+
+after_script:
+  - php vendor/bin/coveralls -v
