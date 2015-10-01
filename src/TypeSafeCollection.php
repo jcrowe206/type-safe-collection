@@ -176,10 +176,12 @@ class TypeSafeCollection extends Collection {
         if ($this->isInvalidElement($element)) {
 
             $this->handleInvalidElement($element);
+
+            return false;
         }
 
+        return true;
     }
-
 
 
     /**
@@ -224,12 +226,7 @@ class TypeSafeCollection extends Collection {
         $type = gettype($element) === 'object' ? get_class($element) : gettype($element);
 
         $message = get_class($this) . ' only accepts elements of types ' . implode(',', $this->allowedClasses) . '. ' . $type . ' provided.';
-
-        if (!$this->passesInternalCheck($element)) {
-
-            $message = 'Invalid argument supplied to ' . get_class($this) . '.';
-        }
-
+        
         throw new InvalidArgumentException($message);
     }
 

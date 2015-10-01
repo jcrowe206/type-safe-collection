@@ -5,7 +5,6 @@ namespace JCrowe\TypeSafeCollection\Tests;
 use InvalidArgumentException;
 use JCrowe\TypeSafeCollection\TypeSafeCollection;
 use Mockery as m;
-use Mockery\MockInterface;
 use PHPUnit_Framework_TestCase as TestCase;
 
 class TypeSafeCollectionTest extends TestCase {
