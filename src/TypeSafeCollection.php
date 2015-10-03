@@ -226,7 +226,7 @@ class TypeSafeCollection extends Collection {
         $type = gettype($element) === 'object' ? get_class($element) : gettype($element);
 
         $message = get_class($this) . ' only accepts elements of types ' . implode(',', $this->allowedClasses) . '. ' . $type . ' provided.';
-        
+
         throw new InvalidArgumentException($message);
     }
 
