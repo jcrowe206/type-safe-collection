@@ -83,7 +83,7 @@ $myLibrary->get('my_readable'); // null
 ## Installation
 
 ```
-composer require jcrowe\type-safe-collection
+composer require jcrowe/type-safe-collection
 ```
 
 ```json
