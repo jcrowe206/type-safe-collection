@@ -82,6 +82,8 @@ $myLibrary->get('my_readable'); // null
 
 ## Installation
 
+#### Laravel 4
+
 ```
 composer require jcrowe/type-safe-collection
 ```
@@ -90,6 +92,20 @@ composer require jcrowe/type-safe-collection
 {
     "require": {
         "jcrowe/type-safe-collection": "~1.0"
+    }
+}
+```
+
+#### Laravel 5
+
+```
+composer require jcrowe/type-safe-collection v5.0
+```
+
+```json
+{
+    "require": {
+        "jcrowe/type-safe-collection": "v5.0"
     }
 }
 ```

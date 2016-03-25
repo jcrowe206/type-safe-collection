@@ -71,11 +71,11 @@ class TypeSafeCollection extends Collection {
      *
      * @param mixed $value
      */
-    public function prepend($value)
+    public function prepend($value, $key = null)
     {
         if ($this->isValidElement($value)) {
 
-            parent::prepend($value);
+            parent::prepend($value, $key);
 
         } else {
 
