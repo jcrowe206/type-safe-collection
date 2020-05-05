@@ -3,7 +3,7 @@
     "description": "A thin wrapper around Illuminate/Collection that allows for enforcing type constraints on the collection elements",
     "license": "MIT",
     "require": {
-        "illuminate/support": "4.0.0 - 5",
+        "illuminate/support": "^4.0 | ^5.0 | ^6.0",
         "php": ">=5.5.0"
     },
     "require-dev": {
