@@ -49,9 +49,9 @@ class TypeSafeCollection extends Collection {
 
 
     /**
-     * Type protection
-     *
+     * @param mixed $key
      * @param mixed $value
+     * @return Collection|void
      */
     public function put($key, $value)
     {
@@ -67,15 +67,14 @@ class TypeSafeCollection extends Collection {
 
 
     /**
-     * Type protection
-     *
-     * @param mixed $value
+     * @param $value
+     * @param null $key
      */
-    public function prepend($value)
+    public function prepend($value, $key = NULL)
     {
         if ($this->isValidElement($value)) {
 
-            parent::prepend($value);
+            parent::prepend($value, $key);
 
         } else {
 
@@ -85,23 +84,23 @@ class TypeSafeCollection extends Collection {
     }
 
 
-
     /**
-     * Type protection
+     * Push one or more items onto the end of the collection.
      *
-     * @param mixed $value
+     * @param  mixed  $values [optional]
+     * @return $this
      */
-    public function push($value)
+    public function push(...$values)
     {
-
-        if ($this->isValidElement($value)) {
-
-            parent::push($value);
-
-        } else {
-
-            $this->handleInvalidElement($value);
+        foreach ($values as $value) {
+            if ($this->isValidElement($value)) {
+                $this->items[] = $value;
+            } else {
+                $this->handleInvalidElement($value);
+            }
         }
+
+        return $this;
     }
 
 
@@ -170,6 +169,7 @@ class TypeSafeCollection extends Collection {
      *
      * @param $element
      * @throws InvalidArgumentException
+     * @return bool
      */
     private function assertIsValidElement($element)
     {
@@ -214,13 +214,13 @@ class TypeSafeCollection extends Collection {
     /**
      * @param $element
      * @throws InvalidArgumentException
+     * @return void
      */
     private function handleInvalidElement($element)
     {
-
         if ($this->shouldIgnoreInvalidElements()) {
 
-            return false;
+            return;
         }
 
         $type = gettype($element) === 'object' ? get_class($element) : gettype($element);
